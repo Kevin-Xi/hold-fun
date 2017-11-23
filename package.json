@@ -1,0 +1,11 @@
+{
+  "name": "hold-fun",
+  "version": "0.0.1",
+  "description": "A server that serve functions",
+  "main": "admin-server",
+  "scripts": {
+    "test": "mocha libs"
+  },
+  "author": "Kevin Xi <kevin.xgr@gmail.com>",
+  "license": "ISC"
+}
