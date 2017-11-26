@@ -15,14 +15,30 @@ function serve(config, routes) {
         }
 
         'todo: trace'
-        matchRes.handleFunc('todo', (err, result) => {
-            if (err) {
-                res.statusCode = 500;
-                return res.end();
-            }
+        let data = '';
+        req.on('data', chunk => {
+            data += chunk;
+        });
 
-            res.setHeader('Content-Type', 'application/json');
-            return res.end(JSON.stringify(result));
+        req.on('end', () => {
+            let body = {};
+            if (data.length) {
+                try {
+                    body = JSON.parse(data);
+                } catch (e) {
+                    res.statusCode = 400;
+                    return res.end();
+                }
+            }
+            matchRes.handleFunc(Object.assign({}, parsed.query, matchRes.params, body), (err, result) => {
+                if (err) {
+                    res.statusCode = 500;
+                    return res.end();
+                }
+
+                res.setHeader('Content-Type', 'application/json');
+                return res.end(JSON.stringify(result));
+            });
         });
     }
 
