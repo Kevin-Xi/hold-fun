@@ -17,7 +17,7 @@ function serve(config, routes) {
         logWrap[l] = log => {
             const incomingTs = `${log.t0.toLocaleDateString()} ${log.t0.toLocaleTimeString()}`;
             const td = Date.now() - log.t0;
-            logger[l](`[${l.toUpperCase()}][${incomingTs}][${td}ms]: ${log.req} -d ${log.data}: ${log.code}`);
+            logger[l](`[${l.toUpperCase()}][${incomingTs}][${td}ms]: ${log.req} -d ${log.data}: ${log.code} - ${log.msg || ''}`);
         }
     });
 
@@ -61,6 +61,7 @@ function serve(config, routes) {
                 log.code = result.code;
                 if (err) {
                     res.statusCode = 500;
+                    log.msg = err.stack || err;
                     logWrap.error(log);
                     return res.end();
                 }
