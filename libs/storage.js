@@ -45,7 +45,10 @@ class Storage {
                 if (err && err.code === 'EEXIST') return callback(null, digest);
                 if (err) return callback(err);
     
-                this.driver.write(fd, str, callback);
+                this.driver.write(fd, str, err => {
+                    if (err) return callback(err);
+                    return callback(null, digest);
+                });
             });
         });
     }
