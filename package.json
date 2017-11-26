@@ -4,6 +4,8 @@
   "description": "A server that serve functions",
   "main": "admin-server",
   "scripts": {
+    "start:admin": "node admin-server",
+    "start:fun": "node fun-server",
     "test": "mocha libs"
   },
   "author": "Kevin Xi <kevin.xgr@gmail.com>",
