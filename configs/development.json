@@ -1,5 +1,12 @@
 {
     "admin": {
         "port": 8080
+    },
+    "fun": {
+        "port": 8082
+    },
+    "storage": {
+        "type": "file",
+        "uri": "./funs"
     }
 }
