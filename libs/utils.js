@@ -4,27 +4,28 @@
  */
 
 function trieify(routes) {
-    const trie = {};
-    routes.forEach(route => {
+    const iTrie = {}, iHMap = {}, iPathsMap = {};
+    routes.forEach((route, i) => {
+        iHMap[i] = route[2];
         const paths = route[0].split('/');
-        let parent = trie;
+        iPathsMap[i] = paths;
+
+        let parent = iTrie;
         paths.forEach(path => {
-            const pathname = path[0] === ':' ? '*' : path;
-            if (!parent[pathname]) parent[pathname] = {};
-            if (pathname === '*' && !parent[pathname]['/*-id']) parent[pathname]['/*-id'] = path.length === 1 ? path : path.slice(1);
-            parent = parent[pathname];
+            const pathKey = path[0] === ':' ? '*' : path;
+            if (!parent[pathKey]) parent[pathKey] = {};
+            parent = parent[pathKey];
         });
-        parent[`/ep-${route[1].toUpperCase()}`] = route[2];
+        const epName = `/ep-${route[1].toUpperCase()}`;
+        if (!parent[epName]) parent[epName] = i;
     });
-    return trie;
+    return { iTrie, iHMap, iPathsMap };
 }
 
-function matchRoute(routeTrie, parsed, method) {
-    const params = {};
-    let handleFunc;
+function matchRoute(trie, parsed, method) {
     const paths = parsed.pathname.split('/');
 
-    let parent = routeTrie;
+    let parent = trie.iTrie;
     let lvl = 0;
     while (lvl < paths.length) {
         const path = paths[lvl];
@@ -32,8 +33,6 @@ function matchRoute(routeTrie, parsed, method) {
         if (parent[path]) {
             parent = parent[path];
         } else if (parent['*']) {
-            const id = parent['*']['/*-id'];
-            params[id] = path;
             parent = parent['*'];
         } else {
             return { matched: false };
@@ -42,15 +41,24 @@ function matchRoute(routeTrie, parsed, method) {
     if (lvl !== paths.length) {
         return { matched: false };
     }
-    handleFunc = parent[`/ep-${method}`] || parent[`/ep-*`];
-    if (!handleFunc) {
+    let epKey = `/ep-${method}`;
+    let iEp = parent[epKey] !== void 0 ? parent[epKey] : parent[`/ep-*`];
+    if (iEp === void 0) {
         return { matched: false };
     }
+
+    let params = {};
+    trie.iPathsMap[iEp].forEach((path, i) => {
+        if (path === '*' || path[0] === ':') {
+            const key = path.length === 1 ? path : path.slice(1);
+            params[key] = paths[i];
+        }
+    });
 
     return {
         matched: true,
         params,
-        handleFunc
+        handleFunc: trie.iHMap[iEp]
     }
 }
 

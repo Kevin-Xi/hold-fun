@@ -7,9 +7,11 @@ describe('utils', function () {
     const routes = [
         [ '/', '*', 1 ],
         [ '/lvl1', 'get', 2 ],
+        [ '/lvl1', 'get', 2.1 ],
         [ '/lvl1', 'post', 3 ],
         [ '/lvl1/:p2', 'get', 4 ],
         [ '/lvl1/:p2/lvl3', 'get', 5 ],
+        [ '/lvl1/*/lvl3', '*', 5.1 ],
         [ '/lvl1/:p2/*/lvl4', '*', 6 ]
     ];
 
@@ -22,9 +24,13 @@ describe('utils', function () {
 
     const tests = [
         ['/', 'GET', true, 1],
+        ['/lvl1', 'GET', true, 2],
+        ['/lvl1', 'POST', true, 3],
         ['/lvl2', 'POST', false],
         ['/lvl1/p2', 'GET', true, 4, {p2: 'p2'}],
         ['/lvl1/p2', 'PATCH', false],
+        ['/lvl1/p2/lvl3', 'GET', true, 5, {p2: 'p2'}],
+        ['/lvl1/p2/lvl3', 'PUT', true, 5.1, {'*': 'p2'}],
         ['/lvl1/p2/p3/lvl4', 'GET', true, 6, {p2: 'p2', '*': 'p3'}],
         ['/lvl1/p2/p3/lvl4', 'HEAD', true, 6, {p2: 'p2', '*': 'p3'}],
         ['/lvl1/p2/p3/lvl4/p5', 'GET', false]
